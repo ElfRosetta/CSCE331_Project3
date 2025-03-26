@@ -44,6 +44,10 @@ app.get('/user', (req, res) => {
         });
 });
 
+app.get('/home', (req, res) => {
+    res.render('home');
+});
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
