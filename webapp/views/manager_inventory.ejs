@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+    <div class = "Reports">
+        <h1>Inventory</h1>
+        <button>Add Inventory</button>
+        <button>Delete Inventory</button>
+        <% for (var i in supply) {%>
+            <p>Name: <%=supply[i].name%>, Current Quantity: <%=supply[i].currquant%>, Fill-To Quantity: <%=supply[i].filltoquant%>, Target Quantity: <%=supply[i].targquant%>, Units: <%=supply[i].units%>, Category: <%=supply[i].category%><p>
+        <% } %>
+    </div>
+</body>

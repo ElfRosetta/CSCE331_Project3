@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom</title>
+</head>
+<body onload = "loadCustom()">
+    <button id="as1">as1</button>
+
+    <button id="as2">as2</button>
+
+    <button id="as3">as3</button>
+
+    <button id="incr">incr</button>
+
+    <button id="decr">decr</button>
+
+    <button id="back">back</button>
+
+    <button id="confirm">confirm</button>
+
+    <button id="delete">delete</button>
+
+    <button id="currentOrder">currentOrder</button>
+
+    <p id="item">0</p>
+
+
+    <p id="quantity">0</p>
+
+    <p id="itemCounter">0</p>
+
+    <p id="cost">0</p>
+
+    <script src="functions.js"></script>
+    <script>
+        
+
+        document.getElementById("confirm").addEventListener("click", function() {
+            if (localStorage.getItem("backTo")=="order"){
+                editQuantityAndIdById(parseInt(localStorage.getItem("customId")),parseInt(document.getElementById("item").textContent),parseInt(document.getElementById("quantity").textContent)-parseInt(localStorage.getItem("customQuantity")));
+                window.location.href = window.location.href.replace("custom","order");
+            }
+            else{
+                pushToCartById(1,parseInt(document.getElementById("quantity").textContent));
+                window.location.href = window.location.href.replace("custom","menu");
+            }
+        });
+
+        document.getElementById("as1").addEventListener("click", function() {
+            document.getElementById("item").textContent="1";
+            document.getElementById("cost").textContent=(parseInt(document.getElementById("quantity").textContent)*10);
+        });
+
+        document.getElementById("as2").addEventListener("click", function() {
+            document.getElementById("item").textContent="2";
+            document.getElementById("cost").textContent=(parseInt(document.getElementById("quantity").textContent)*10);
+        });
+
+        document.getElementById("as3").addEventListener("click", function() {
+            document.getElementById("item").textContent="3";
+            document.getElementById("cost").textContent=(parseInt(document.getElementById("quantity").textContent)*10);
+        });
+
+        document.getElementById("incr").addEventListener("click", function() {
+            document.getElementById("quantity").textContent = String(parseInt(document.getElementById("quantity").textContent) + 1);
+            var curId = parseInt(document.getElementById("item").textContent);
+            document.getElementById("cost").textContent=(parseInt(document.getElementById("quantity").textContent)*10);
+        });
+
+        document.getElementById("decr").addEventListener("click", function() {
+            if(parseInt(document.getElementById("quantity").textContent)>1){
+                document.getElementById("quantity").textContent = String(parseInt(document.getElementById("quantity").textContent) - 1);
+                var curId = parseInt(document.getElementById("item").textContent);
+                document.getElementById("cost").textContent=(parseInt(document.getElementById("quantity").textContent)*10);
+            }
+        });
+
+        document.getElementById("back").addEventListener("click", function() {
+            if (localStorage.getItem("backToPlus")!=""){
+                window.location.href = window.location.href.replace("custom",localStorage.getItem("backTo")+localStorage.getItem("backToPlus"));
+            }
+            else{
+                window.location.href = window.location.href.replace("custom",localStorage.getItem("backTo"));
+            }
+        });
+
+        document.getElementById("delete").addEventListener("click", function() {
+            deleteItemById(parseInt(localStorage.getItem("customId")));
+            window.location.href = window.location.href.replace("custom",localStorage.getItem("backTo"));
+        });
+
+        document.getElementById("currentOrder").addEventListener("click", function() {
+            window.location.href = window.location.href.replace("custom","order");
+        });
+
+    </script>
+</body>
+</html>
