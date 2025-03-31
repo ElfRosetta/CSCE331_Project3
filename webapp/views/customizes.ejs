@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <section class="header">
+        <button class="backToMenu" onclick="location.href='/menu'">backToMenu</button>
+        <section class="weatherAndLogin">
+            <p>Logged in ___</p>
+            <p>Weather</p>
+        </section>
+    </section>
+    <section class="menu">
+        <% for (var i in data) {%>
+            <button><%=data[i].base_item%></button>
+        <% } %>
+    </section>
+    <section class="footnote">
+        <section class="companyLabel">
+            <p>Copyright Penguin Coffee Company</p>
+            <p>Contact Us Here:</p>
+            <p>penguinCoffee@aol.com</p>
+            <p>123.456.7890</p>
+        </section>
+        <button class="seeOrder">Current Order</button>
+        <button class="colorChangeButton">Color Change</button>
+    </section>
+</body>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order</title>
+</head>
+<body onload = "loadOrder()">
+    <button id="loadSaverButton">Load Saver</button>
+
+    
+
+
+    <button id="cart1">Cart1</button>
+    <button id="cart2">Cart2</button>
+    <button id="cart3x2">Cart3x2</button>
+
+
+    <button id="cartoff1">CartOff1</button>
+
+    <button id="back">back to menu</button>
+
+    <li id="orders">
+        
+    </li>
+    <p id="cost">0</p>
+    <p id="itemCounter">0</p>
+
+    <script src="functions.js"></script>
+    <script>
+        
+
+        document.getElementById("cart1").addEventListener("click", function() {
+            pushToCartByIdNow(1, 1);
+        });
+
+        document.getElementById("cart2").addEventListener("click", function() {
+            pushToCartByIdNow(2, 1);
+        });
+
+        document.getElementById("cart3x2").addEventListener("click", function() {
+            pushToCartByIdNow(3, 2);
+        });
+
+
+        document.getElementById("cartoff1").addEventListener("click", function() {
+            pushToCartById(1, 1);
+        });
+
+        document.getElementById("loadSaverButton").addEventListener("click", function() {
+            loadSaver();
+        });
+
+
+        document.getElementById("back").addEventListener("click", function() {
+            if (localStorage.getItem("backToPlus")!=""){
+                window.location.href = window.location.href.replace("order","menu"+localStorage.getItem("backToPlus"));
+            }
+            else{
+                window.location.href = window.location.href.replace("order","menu");
+            }
+        });
+
+    </script>
+</body>
+</html>

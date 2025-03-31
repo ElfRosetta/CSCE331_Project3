@@ -1,0 +1,14 @@
+    <!DOCTYPE html>
+    <head>
+        <title>Home Page</title>
+    </head>
+    <body>
+        <div class="Employees">
+            <h1>Employees</h1>
+            <button>Add Employees</button>
+            <button>Delete Employees</button>
+            <% for (var i in employees) {%>
+                <p>Name: <%=employees[i].name%>, ID: <%=employees[i].id%><p>
+            <% } %>
+        </div>
+    </body>
