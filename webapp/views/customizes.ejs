@@ -1,31 +1,140 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cashier</title>
+    <title>Customize Your Drink - Penguin Coffee</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <section class="header">
-        <button class="backToMenu" onclick="location.href='/menu'">backToMenu</button>
+        <button class="backToMenu" onclick="location.href='/menu/<%= item_category %>'">
+            <i class="fas fa-arrow-left"></i> Back to Items
+        </button>
+        <p><%= default_item.base_item %></p>
         <section class="weatherAndLogin">
-            <p>Logged in ___</p>
+            <p id="userLoggedIn"></p>
             <p>Weather</p>
         </section>
     </section>
-    <section class="menu">
-        <% for (var i in data) {%>
-            <button><%=data[i].base_item%></button>
+
+    <section class="customizes">
+        <!-- Syrups Section -->
+        <% if (syrups && syrups.length > 1) { %>
+            <section class="customize-section" id="syrup-options">
+                <h2>Select Syrup</h2>
+                <div class="option-buttons">
+                    <% for (var i in syrups) { %>
+                        <button 
+                            class="syrup-button" 
+                            onclick="selectOption('syrup', '<%=syrups[i].syrup%>')">
+                            <%= syrups[i].syrup === null ? 'None' : syrups[i].syrup %>
+                        </button>
+                    <% } %>
+                </div>
+            </section>
         <% } %>
+          
+        <!-- Milks Section -->
+        <% if (milks && milks.length > 1) { %>
+            <section class="customize-section" id="milk-options">
+                <h2>Select Milk</h2>
+                <div class="option-buttons">
+                    <% for (var i in milks) { %>
+                        <button 
+                            class="milk-button" 
+                            onclick="selectOption('milk', '<%=milks[i].milk%>')">
+                            <%= milks[i].milk === null ? 'None' : milks[i].milk %>
+                        </button>
+                    <% } %>
+                </div>
+            </section>
+        <% } %>
+
+        <!-- Liquids Section -->
+        <% if (liquids && liquids.length > 1) { %>
+            <section class="customize-section" id="liquid-options">
+                <h2>Select Liquid Base</h2>
+                <div class="option-buttons">
+                    <% for (var i in liquids) { %>
+                        <button 
+                            class="liquid-button" 
+                            onclick="selectOption('liquid', '<%=liquids[i].liquid%>')">
+                            <%= liquids[i].liquid === null ? 'None' : liquids[i].liquid %>
+                        </button>
+                    <% } %>
+                </div>
+            </section>
+        <% } %>
+
+        <!-- Containers Section -->
+        <% if (containers && containers.length > 1) { %>
+            <section class="customize-section" id="container-options">
+                <h2>Select Cup Size</h2>
+                <div class="option-buttons">
+                    <% for (var i in containers) { %>
+                        <button 
+                            class="container-button" 
+                            onclick="selectOption('container', '<%=containers[i].container%>')">
+                            <%= containers[i].container === null ? 'None' : containers[i].container %>
+                        </button>
+                    <% } %>
+                </div>
+            </section>
+        <% } %>
+
+        <!-- Add to Order Button -->
+        <button class="add-to-order" onclick="universalShove('<%= all %>', '<%= default_item.base_item %>', getValue('syrup'), getValue('liquid'), getValue('milk'), getValue('container'), '<%= item_category %>', document.getElementById('quantity').textContent)">Add to Order</button>
+
+        <div class="label-value-pair">
+            <div class="label">Quantity:</div>
+            <div class="value" id="quantity">1</div>
+        </div>
+
+        <button id="quantityInc">Increment</button>
+        <button id="quantityDec">Decrement</button>
+        <p id="price"><%= default_item.price %></p>
+        <p id="cartTotal"></p>
     </section>
+
     <section class="footnote">
         <section class="companyLabel">
-            <p>Copyright Penguin Coffee Company</p>
-            <p>Contact Us Here:</p>
-            <p>penguinCoffee@aol.com</p>
-            <p>123.456.7890</p>
+            <p>© 2025 Penguin Coffee Company</p>
+            <p>Contact: penguinCoffee@aol.com | 123.456.7890</p>
         </section>
-        <button class="seeOrder">Current Order</button>
-        <button class="colorChangeButton">Color Change</button>
+        <div class="button-group">
+            <button class="seeOrder" onclick="goToOrder('/menu/<%= item_category %>')">Current Order</button>
+            <button class="colorChangeButton" onclick="toggleTheme()">Change Theme</button>
+        </div>
     </section>
+
+    <script src="/functions.js"></script>
+    <script>
+        document.getElementById("quantityInc").addEventListener("click", function() {
+            if (parseInt(document.getElementById('quantity').textContent) < 99)
+            {
+                document.getElementById('quantity').textContent = String(parseInt(document.getElementById('quantity').textContent) + 1);
+                document.getElementById("price").textContent = String(parseFloat(getValue("price")) * parseInt(document.getElementById('quantity').textContent))
+            }
+            });
+
+        document.getElementById("quantityDec").addEventListener("click", function() {
+            if (parseInt(document.getElementById('quantity').textContent) > 1)
+            {
+                document.getElementById('quantity').textContent = String(parseInt(document.getElementById('quantity').textContent) - 1);
+                document.getElementById("price").textContent = String(parseFloat(getValue("price")) * parseInt(document.getElementById('quantity').textContent))
+            }
+        });
+        setDefaultSelections('<%= default_item.syrup %>', '<%= default_item.milk %>', '<%= default_item.liquid %>', '<%= default_item.container %>', '<%= default_item.price %>');
+
+        getCartTotal();
+        logedUserID();
+
+        selectOption('syrup', getValue('syrup'));
+        selectOption('milk', getValue('milk'));
+        selectOption('liquid', getValue('liquid'));
+        selectOption('container', getValue('container'));
+        
+    </script>
 </body>
+</html>

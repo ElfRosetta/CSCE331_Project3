@@ -3,63 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order</title>
+    <title>Current Order - Penguin Coffee</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body onload = "loadOrder()">
+
+    <section class="header">
+        <button class="backToMenu" id="back">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <section class="weatherAndLogin">
+            <p id="userLoggedIn"></p>
+            <p>Weather</p>
+        </section>
+    </section>
+
     <button id="loadSaverButton">Load Saver</button>
+
 
     
 
 
-    <button id="cart1">Cart1</button>
-    <button id="cart2">Cart2</button>
-    <button id="cart3x2">Cart3x2</button>
+    
 
-
-    <button id="cartoff1">CartOff1</button>
-
-    <button id="back">back to menu</button>
 
     <li id="orders">
         
     </li>
-    <p id="cost">0</p>
-    <p id="itemCounter">0</p>
+
+    <div class="label-value-pair">
+        <div class="label">Item count:</div>
+        <div class="value" id="itemCounter">0</div>
+    </div>
+
+    <div class="label-value-pair">
+        <div class="label">Total cost:</div>
+        <div class="value" id="cost">0</div>
+    </div>
+
+    
+
+
+
+    <section class="footnote">
+        <section class="companyLabel">
+            <p>© 2025 Penguin Coffee Company</p>
+            <p>Contact: penguinCoffee@aol.com | 123.456.7890</p>
+        </section>
+        <div class="button-group">
+            <button class="seeOrder" id="confirm">Confirm Order</button>
+            <button class="colorChangeButton" onclick="toggleTheme()">Change Theme</button>
+        </div>
+    </section>
 
     <script src="functions.js"></script>
     <script>
         
 
-        document.getElementById("cart1").addEventListener("click", function() {
-            pushToCartByIdNow(1, 1);
-        });
 
-        document.getElementById("cart2").addEventListener("click", function() {
-            pushToCartByIdNow(2, 1);
-        });
-
-        document.getElementById("cart3x2").addEventListener("click", function() {
-            pushToCartByIdNow(3, 2);
-        });
-
-
-        document.getElementById("cartoff1").addEventListener("click", function() {
-            pushToCartById(1, 1);
-        });
 
         document.getElementById("loadSaverButton").addEventListener("click", function() {
             loadSaver();
         });
 
+        document.getElementById("confirm").addEventListener("click", function() {
+            orderPush();
+        });
+
 
         document.getElementById("back").addEventListener("click", function() {
-            if (localStorage.getItem("backToPlus")!=""){
-                window.location.href = window.location.href.replace("order","menu"+localStorage.getItem("backToPlus"));
-            }
-            else{
-                window.location.href = window.location.href.replace("order","menu");
-            }
+            window.location.href =localStorage.getItem("backTo");
         });
+
+        logedUserID();
 
     </script>
 </body>

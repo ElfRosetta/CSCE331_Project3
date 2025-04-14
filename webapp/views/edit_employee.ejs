@@ -11,5 +11,20 @@
         <button class = "backtoManagerInventory" onclick="location.href='manager_inventory'">Inventory</button>
         <button class="backToMenu" onclick="location.href='/menu'">backToMenu</button>
     </div>
-    
+
+    <div class="Employees">
+        <!-- EDIT EMPLOYEE -->
+        <button>Edit Employee</button>
+        <p>Employee ID is: <%= id %></p>
+    </div>
+
+
+    <script src="functions.js"></script>
+    <script>
+        document.getElementById("EditEmployees").addEventListener("click", function() {
+        EditEmployee();
+    });
+
+
+    </script>
 </body>

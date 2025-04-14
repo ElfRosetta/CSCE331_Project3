@@ -9,23 +9,34 @@
     <section class="header">
         <section class="menuLabel">Menu</section>
         <section class="weatherAndLogin">
-            <p>Logged in ___</p>
-            <p>Weather</p>
+            <button onclick="location.href='/manager'">Manager Side</button>
+            <p id="userLoggedIn"></p>
+            <p>Temperature: <%= ((weather.main.temp -273.15) * 9/5 + 32).toFixed(2) %> F</p>
         </section>
     </section>
-    <section class="menu">
-        <% for (var i in data) {%>
-            <button onclick="location.href='/menu/<%= data[i].item_category %>'"><%=data[i].item_category%></button>
+    
+    <div class="menu-categories">
+        <% for (var i in data.item_categories) {%>
+            <button class="menu-category-button" onclick="location.href='/menu/<%= data.item_categories[i].item_category %>'">
+                <%=data.item_categories[i].item_category%>
+            </button>
         <% } %>
-    </section>
+    </div>
+    
     <section class="footnote">
         <section class="companyLabel">
-            <p>Copyright Penguin Coffee Company</p>
-            <p>Contact Us Here:</p>
-            <p>penguinCoffee@aol.com</p>
-            <p>123.456.7890</p>
+            <p>© 2025 Penguin Coffee Company</p>
+            <p>Contact: penguinCoffee@aol.com | 123.456.7890</p>
         </section>
-        <button class="seeOrder">Current Order</button>
-        <button class="colorChangeButton">Color Change</button>
+        <div class="button-group">
+            <button class="seeOrder" onclick="goToOrder('/menu')">Current Order</button>
+            <button class="colorChangeButton" onclick="toggleTheme()">Change Theme</button>
+        </div>
     </section>
+
+    <script src="/functions.js"></script>
+
+    <script>
+        logedUserID();
+    </script>
 </body>

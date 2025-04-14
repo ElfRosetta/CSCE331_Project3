@@ -1,0 +1,50 @@
+<!-- views/login.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="/login" method="POST">
+            <div>
+                <label for="id">User ID:</label>
+                <input type="text" id="id" name="id" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button ID="googleLoginButton" type="submit">Login</button>
+        </form>
+        <% if (message) { %>
+            <div class="error-message"><%= message %></div>
+        <% } %>
+    </div>
+
+    <script>
+        // Check for token in URL fragment
+        if (window.location.hash) {
+            // Parse the access token from URL fragment
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = params.get('access_token');
+            const error = params.get('error');
+            
+            if (accessToken) {
+                // Clean up the URL removing the access tokens
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                window.location.href = '/menu';
+            } else if (error) {
+                console.error('Authentication failed:', error);
+                
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>
