@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom</title>
+</head>
+<body onload = "loadCustom()">
+    <button id="as1">as1</button>
+
+    <button id="as2">as2</button>
+
+    <button id="as3">as3</button>
+
+    <button id="back">back</button>
+
+    <button id="delete">delete</button>
+
+    <button id="currentOrder">currentOrder</button>
+
+    <button id="loadSaverButton">Load Saver</button>
+
+    <p id="itemCounter">0</p>
+
+
+
+    <script src="functions.js"></script>
+    <script>
+        
+        document.getElementById("loadSaverButton").addEventListener("click", function() {
+            loadSaver();
+        });
+        
+
+        document.getElementById("as1").addEventListener("click", function() {
+            universalShove("1","cof1","cof1s","cof1l","cof1m","cof1c","1","8");
+            if (localStorage.getItem("customIndex")=="-1"){
+                window.location.href = "/menu";
+            }
+            else{
+                window.location.href = "/order";
+            }
+        });
+
+        document.getElementById("as2").addEventListener("click", function() {
+            universalShove("2","cof22","cof22s","cof22l","cof22m","cof22c","2","19");
+            if (localStorage.getItem("customIndex")=="-1"){
+                window.location.href = "/menu";
+            }
+            else{
+                window.location.href = "/order";
+            }
+        });
+
+        document.getElementById("as3").addEventListener("click", function() {
+            universalShove("3","cof333","cof333s","cof333l","cof333m","cof333c","3","30");
+            if (localStorage.getItem("customIndex")=="-1"){
+                window.location.href = "/menu";
+            }
+            else{
+                window.location.href = "/order";
+            }
+        });
+
+        
+
+        document.getElementById("back").addEventListener("click", function() {
+            window.location.href = localStorage.getItem("backTo");
+        });
+
+        document.getElementById("delete").addEventListener("click", function() {
+            deleteCustomIndex(parseInt(localStorage.getItem("customIndex")));
+            window.location.href = "/order";
+        });
+
+        document.getElementById("currentOrder").addEventListener("click", function() {
+            window.location.href = "/order";
+        });
+
+    </script>
+</body>
+</html>
