@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <title>Manager Items</title>
+</head>
+<body>
+    <div class = "ManagerHeader">
+        <button class="backToManagerHome" onclick="location.href='/manager'">Manager Home</button>
+        <button class = "backtoManagerReports" onclick="location.href='manager_reports'">Reports</button>
+        <button class = "backtoManagerEmployees" onclick="location.href='manager_employees'">Employees</button>
+        <button class = "backtoManagerItems" onclick="location.href='managerItems'">Items</button>
+        <button class = "backtoManagerInventory" onclick="location.href='manager_inventory'">Inventory</button>
+        <button class="backToMenu" onclick="location.href='/menu'">Back To Menu</button>
+    </div>
+
+    <h1 class = ManagerItemsHeader>Items:</h1>
+
+    <div class = "ItemsList">
+        <% for (var i in items) {%>
+            <p><%=items[i].base_item%>, <%=items[i].item_id%>, $<%=items[i].price%><p>
+        <% } %>
+    </div>
+    
+    <div class = "ManagerItemsButtons">
+
+        <!-- Edit Item -->
+        <button class = "updateItemButton" onclick="location.href='custom'">Update Items</button>
+    </div>
+    
+
+    <div class = "HomeFooter"></div>
+
+    <script src="functions.js"></script>
+    <script>
+        document.getElementById("AddItem").addEventListener("click", function() {
+            AddEmployee();
+        });
+
+        document.getElementById("DeleteEmployee").addEventListener("click", function() {
+            DeleteEmployee();
+        });
+
+        const ITEMS_URL = `<%= url %>`;
+
+        document.getElementById("updateItemButton").addEventListener("click", async function() {
+            EditItem();
+        });
+
+    </script>
+</body>

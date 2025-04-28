@@ -1,0 +1,81 @@
+<!-- views/login.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form action="/login" method="POST">
+            <div>
+                <label for="id">User ID:</label>
+                <input type="text" id="id" name="id" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button id="googleLoginButton" type="submit">Login</button>
+            <button id="guestLogin" type="button">Log in as guest</button>
+        </form>
+        <% if (message) { %>
+            <div class="error-message"><%= message %></div>
+        <% } %>
+    </div>
+
+    <div id="google_translate_element"></div>
+
+    <script src="functions.js"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        // Check for token in URL fragment
+        if (window.location.hash) {
+            // Parse the access token from URL fragment
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const accessToken = params.get('access_token');
+            const error = params.get('error');
+            
+            if (accessToken) {
+                // Clean up the URL removing the access tokens
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+                window.location.href = '/menu';
+            } else if (error) {
+                console.error('Authentication failed:', error);
+                
+                window.location.href = '/login';
+            }
+        }
+
+        document.getElementById("googleLoginButton").addEventListener("click", function (e) {
+            loginID(document.getElementById('id').value); 
+        })
+
+        document.getElementById("guestLogin").addEventListener("click", function (e) {
+            e.preventDefault();
+            document.getElementById("id").value = "-1";
+            document.getElementById("password").value = "guest"; 
+            
+            loginID(document.getElementById('id').value); 
+            setAccess(document.getElementById('id').value, '<%= url %>');
+
+            location.href = "/menu";
+        })
+
+        document.addEventListener("DOMContentLoaded", () => {
+            localStorage.setItem("preferredLang", "en");
+            storeLanguagePreference();
+            applyStoredLanguage();
+        });
+
+
+        window.onload = function() {
+            loadSaver();
+        };
+    </script>
+</body>
+</html>

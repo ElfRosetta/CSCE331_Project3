@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Order - Penguin Coffee</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    <section class="header">
+        <button class="backToMenu" id="back">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <h2>Current Order</h2>
+        <section class="weatherAndLogin">
+            <p id="userLoggedIn"></p>
+            <p>Temperature: <%= ((weather.main.temp -273.15) * 9/5 + 32).toFixed(2) %> °F</p>
+
+        </section>
+    </section>
+
+    <div class="scrollyZone">
+        <li id="orders">
+            
+        </li>
+
+        <div class="label-value-pair">
+            <div class="label">Item Count:  </div>
+            <div class="value" id="itemCounter">0</div>
+        </div>
+
+        <div class="label-value-pair">
+            <div class="label">Total Cost: $</div>
+            <div class="value" id="cost">0</div>
+        </div>
+    </div>
+    <section class="footnote">
+        <section class="companyLabel">
+            <p>© 2025 Penguin Coffee Company</p>
+            <p>Contact: penguinCoffee@aol.com | 123.456.7890</p>
+        </section>
+        <div id="google_translate_element"></div>
+        <div class="button-group">
+            <button class="seeOrder" id="confirm">Confirm Order</button>
+            <button class="colorChangeButton" onclick="toggleTheme()">Accessibility Features</button>
+        </div>
+    </section>
+
+    <script src="functions.js"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        
+        const new_url = '<%= url %>';
+
+
+        document.getElementById("confirm").addEventListener("click", function() {
+            orderPush(new_url);
+        });
+
+        document.getElementById("back").addEventListener("click", function() {
+            window.location.href =localStorage.getItem("backTo");
+        });
+
+        logedUserID();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            storeLanguagePreference();
+            applyStoredLanguage();
+        });
+
+        window.onload = function() {
+            loadOrder();
+            const savedTheme = localStorage.getItem('theme');
+            const savedZoom = localStorage.getItem('zoom');
+
+            if (savedTheme === 'bold') {
+            document.body.classList.add('boldRoot');
+            }
+
+            if (savedZoom) {
+            document.body.style.zoom = savedZoom;
+            }
+        };
+
+    </script>
+</body>
+</html>

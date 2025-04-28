@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom</title>
+    <style>
+        .list-container {
+          display: flex;
+          gap: 20px;
+        }
+    
+        .list {
+          display: flex;
+          flex-direction: column;
+          border: 1px solid #ccc;
+          padding: 10px;
+          width: 150px;
+        }
+    
+        .list label {
+          margin-bottom: 5px;
+        }
+      </style>
+</head>
+<body onload = "loadItemsM()">
+
+    <div class = "ManagerHeader">
+        <button class="backToManagerHome" onclick="location.href='/manager'">Manager Home</button>
+        <button class = "backtoManagerReports" onclick="location.href='manager_reports'">Reports</button>
+        <button class = "backtoManagerEmployees" onclick="location.href='manager_employees'">Employees</button>
+        <button class = "backtoManagerItems" onclick="location.href='managerItems'">Items</button>
+        <button class = "backtoManagerInventory" onclick="location.href='manager_inventory'">Inventory</button>
+        <button class="backToMenu" onclick="location.href='/menu'">Back To Menu</button>
+    </div>
+
+    <form id="selectBaseItemF"></form>
+
+    <form id="changeTypeF">
+        <select name="changeType" id="changeType">
+            <option value="new options">New Options</option>
+            <option value="remove options">Remove Options</option>
+            <option value="change price">Change Price</option>
+            <option value="change default">Change Default</option>
+        </select>
+    </form>
+
+    <button id="continue">Continue</button>
+
+    <p id = "subHead">Nothing Selected</p>
+    
+    <div class="list-container" id="lists"></div>
+
+    <div id="listsAux"></div>
+
+    <button id="confirm">Confirm</button>
+
+    <script src="functions.js"></script>
+    <script>
+
+        const new_url = '<%= url %>';
+
+        document.getElementById("continue").addEventListener("click",async function() {
+            selectBaseItem=document.getElementById("selectBaseItem").value;
+            changeType=document.getElementById("changeType").value;
+            if (selectBaseItem=="new"){
+                changeType="new";
+                document.getElementById("subHead").textContent="new item";
+            }
+            else{
+                document.getElementById("subHead").textContent=selectBaseItem+":"+changeType;
+            }
+            
+            dataM = await justDoIt("select array_agg(distinct milk) from items where base_item = '"+selectBaseItem+"';",new_url);
+            dataS = await justDoIt("select array_agg(distinct syrup) from items where base_item = '"+selectBaseItem+"';",new_url);
+            dataL = await justDoIt("select array_agg(distinct liquid) from items where base_item = '"+selectBaseItem+"';",new_url);
+            dataC = await justDoIt("select array_agg(distinct container) from items where base_item = '"+selectBaseItem+"';",new_url);
+
+            const lists = [(dataM.rows[0].array_agg),(dataS.rows[0].array_agg),(dataL.rows[0].array_agg),(dataC.rows[0].array_agg)];
+            
+            const container = document.getElementById('lists');
+            console.log(lists);
+
+            container.innerHTML = '';
+            document.getElementById('listsAux').innerHTML = '';
+
+            selectionMode="multi";
+            if (changeType==="change default"){
+                selectionMode="exact-one-per-column";
+            }
+
+            selectionClass="old";
+            if (changeType === "new options"){
+                selectionClass="new";
+            }
+            if (changeType=== "new"){
+                selectionClass="new";
+            }
+            
+            decode=["Milk","Syrup","Liquid","Container"];
+
+            lists.forEach((list, colIndex) => {
+            const listDiv = document.createElement('div');
+            listDiv.className = 'list';
+            
+            if (selectionClass==="old"){
+                list.forEach((item, itemIndex) => {
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = item;
+                    checkbox.name = `list${colIndex}`;
+                    checkbox.dataset.column = colIndex;
+
+                    if (selectionMode === 'exact-one-per-column' && itemIndex === 0) {
+                    checkbox.checked = true;
+                    }
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode((item == '' ? 'None' : item)));
+                    listDiv.appendChild(label);
+                });
+            }
+
+            if (selectionClass==="new"){
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Add item';
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && input.value.trim()) {
+                    const newItem = input.value.trim();
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = newItem;
+                    checkbox.name = `list${colIndex}`;
+                    checkbox.dataset.column = colIndex;
+
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(' ' + newItem));
+                    listDiv.insertBefore(label, input);
+                    input.value = '';
+                    }
+                });
+                listDiv.appendChild(input);
+            }
+            const label2 = document.createElement('label');
+            label2.appendChild(document.createTextNode(decode[colIndex]));
+            label2.appendChild(listDiv);
+            
+            container.appendChild(label2);
+            });
+
+            if ((changeType==="new")||(changeType==="change price")){
+                const containerAux = document.getElementById('listsAux');
+
+                const priceBox = document.createElement('input');
+                priceBox.type = 'text';
+                priceBox.placeholder = 'price';
+                priceBox.id="priceBox";
+                containerAux.appendChild(priceBox);
+                if (changeType==="new"){
+                    const nameBox = document.createElement('input');
+                    nameBox.type = 'text';
+                    nameBox.placeholder = 'name';
+                    nameBox.id="nameBox";
+                    containerAux.appendChild(nameBox);
+                    const contBox = document.createElement('input');
+                    contBox.type = 'text';
+                    contBox.placeholder = 'catagory';
+                    contBox.id="contBox";
+                    containerAux.appendChild(contBox);
+                }
+            }
+
+            container.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                const column = e.target.dataset.column;
+                const checkboxes = document.querySelectorAll(`input[name="list${column}"]`);
+
+
+                if (selectionMode === 'exact-one-per-column') {
+                const checked = Array.from(checkboxes).filter(cb => cb.checked);
+                if (checked.length === 0) {
+                    e.target.checked = true;
+                } else {
+                    checkboxes.forEach(cb => {
+                    if (cb !== e.target) cb.checked = false;
+                    });
+                }
+                }
+            }
+            });
+            
+        });
+
+        
+        
+        document.getElementById("confirm").addEventListener("click",async function() {
+            //console.log(whereAra(milkSel,[],liquSel,contSel));
+            //typeToAdd,stringToAdd,baseItem,price,milk,syrup,liquid,container,category,new_url
+
+            if (document.getElementById("subHead").textContent==="Nothing selected"){
+                console.log("no");
+                return;
+            }
+
+            if (document.getElementById("subHead").textContent==="new item"){
+                selectBaseItem="new";
+                changeType="new";
+            }
+            else{
+                selectBaseItem=document.getElementById("subHead").textContent.split(":")[0];
+                changeType=document.getElementById("subHead").textContent.split(":")[1];
+            }
+
+
+            const milkSel = Array.from(document.querySelectorAll('input[name="list0"]:checked')).map(cb => cb.value);
+            const syruSel = Array.from(document.querySelectorAll('input[name="list1"]:checked')).map(cb => cb.value);
+            const liquSel = Array.from(document.querySelectorAll('input[name="list2"]:checked')).map(cb => cb.value);
+            const contSel = Array.from(document.querySelectorAll('input[name="list3"]:checked')).map(cb => cb.value);
+
+
+            if(changeType==="new options"){
+                //console.log(1);
+
+                //string arrays have all options for base item
+                dataPr = await justDoIt("select array_agg(price) from items where default_item='t' and base_item = '"+selectBaseItem+"';",new_url);
+                dataCo = await justDoIt("select array_agg(item_category) from items where default_item='t' and base_item = '"+selectBaseItem+"';",new_url);
+
+                dataM = await justDoIt("select array_agg(distinct milk) from items where base_item = '"+selectBaseItem+"';",new_url);
+                dataS = await justDoIt("select array_agg(distinct syrup) from items where base_item = '"+selectBaseItem+"';",new_url);
+                dataL = await justDoIt("select array_agg(distinct liquid) from items where base_item = '"+selectBaseItem+"';",new_url);
+                dataC = await justDoIt("select array_agg(distinct container) from items where base_item = '"+selectBaseItem+"';",new_url);
+
+                lists = [(dataM.rows[0].array_agg),(dataS.rows[0].array_agg),(dataL.rows[0].array_agg),(dataC.rows[0].array_agg)];
+                await editItemNew("milk",milkSel,selectBaseItem,String(dataPr.rows[0].array_agg[0]),lists[0],lists[1],lists[2],lists[3],dataCo.rows[0].array_agg[0],new_url);
+                lists[0]=lists[0].concat(milkSel);
+                await editItemNew("syrup",syruSel,selectBaseItem,String(dataPr.rows[0].array_agg[0]),lists[0],lists[1],lists[2],lists[3],dataCo.rows[0].array_agg[0],new_url);
+                lists[1]=lists[1].concat(syruSel);
+                await editItemNew("liquid",liquSel,selectBaseItem,String(dataPr.rows[0].array_agg[0]),lists[0],lists[1],lists[2],lists[3],dataCo.rows[0].array_agg[0],new_url);
+                lists[2]=lists[2].concat(liquSel);
+                await editItemNew("container",contSel,selectBaseItem,String(dataPr.rows[0].array_agg[0]),lists[0],lists[1],lists[2],lists[3],dataCo.rows[0].array_agg[0],new_url);
+
+            }
+            else if (changeType==="remove options"){
+                //console.log(2);
+
+                //string arrays have selected options for base item
+                await deleteItem(selectBaseItem,milkSel,syruSel,liquSel,contSel,new_url)
+            }
+            else if (changeType==="change price"){
+                //console.log(3);
+
+                //string arrays have selected options for base item
+                price = parseFloat(document.getElementById("priceBox").value.trim());
+                if (isNaN(price)){
+                    console.log("no");
+                    return;
+                }
+
+
+                await editItemPrice(selectBaseItem,String(price),milkSel,syruSel,liquSel,contSel,new_url);
+            }
+            else if (changeType==="change default"){
+                //console.log(4);
+
+                //string arrays have one selected option for base item
+                await setDefaultItem(selectBaseItem,milkSel,syruSel,liquSel,contSel,new_url);
+            }
+            else if (changeType==="new"){
+                //console.log(5);
+
+                //string arrays have selected options for base item
+                price = parseFloat(document.getElementById("priceBox").value.trim());
+                if (isNaN(price)){
+                    console.log("no");
+                    return;
+                }
+
+                nameB = document.getElementById("nameBox").value.trim();
+                contB = document.getElementById("contBox").value.trim();
+                if ((nameB==="")||(contB==="")){
+                    console.log("no");
+                    return;
+                }
+
+                await editItemBase(nameB,String(price),milkSel,syruSel,liquSel,contSel,contB,new_url);
+            }
+
+            
+        });
+        
+        async function loadItemsM() {
+            target = document.getElementById("selectBaseItemF");
+
+
+            data = await justDoIt('SELECT DISTINCT base_item FROM items;',new_url);
+
+            const optionsHtml = data.rows.map(row =>
+                `<option value="${row.base_item}">${row.base_item}</option>`
+            ).join('');
+
+            target.innerHTML = `
+                <select name="selectBaseItem" id="selectBaseItem">
+                    ${optionsHtml}
+                    <option value="new">new</option>
+                </select>
+            `;
+        }
+
+       
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<head>
+    <title>Home Page</title>
+</head>
+<body onload = "loadItemsI()">
+    <div class = "ManagerHeader">
+        <button class="backToManagerHome" onclick="location.href='/manager'">Manager Home</button>
+        <button class = "backtoManagerReports" onclick="location.href='manager_reports'">Reports</button>
+        <button class = "backtoManagerEmployees" onclick="location.href='manager_employees'">Employees</button>
+        <button class = "backtoManagerItems" onclick="location.href='managerItems'">Items</button>
+        <button class = "backtoManagerInventory" onclick="location.href='manager_inventory'">Inventory</button>
+        <button class="backToMenu" onclick="location.href='/menu'">Back To Menu</button>
+    </div>
+    <div class = "Inventory">
+        <h1>Inventory</h1>
+        <!-- ADD INVENTORY   currquant | filltoquant | targquant | changecount | ordermore |        name         |  category  |  units-->
+        <form action="/add-inventory" method="POST">
+            <label for="AddInventoryName">New Inventory Item Name:</label>
+            <input type="text" id="AddInventoryName" name="name">
+
+            <label for="AddInventoryCurrQuant">New Inventory Item Current Quantity:</label>
+            <input type="text" id="AddInventoryCurrQuant" name="currquant">
+        
+            <label for="AddInventoryFillToQuant">Current Inventory Item Fill To Quantity:</label>
+            <input type="text" id="AddInventoryFillToQuant" name="filltoquant">
+
+            <label for="AddInventoryTargQuant">Current Inventory Item Target Quantity:</label>
+            <input type="text" id="AddInventoryTargQuant" name="targquant">
+
+            <label for="AddInventoryCategory">New Inventory Item Category:</label>
+            <select id="AddInventoryCategory" name="category" onchange="toggleCustomCategory(this)">
+                <option value="" disabled selected>Select Category:</option>
+                <option value="coffee">Coffee</option>
+                <option value = "milk">Milk</option>
+                <option value = "sandwich">Sandwich</option>
+                <option value = "pastries">Pastries</option>
+                <option value = "containers">Containers</option>
+                <option value = "syrup">Syrup</option>
+                <option value="Other">Other</option>
+            </select>
+            <div id="customCategoryDiv" style="display: none; margin-top: 10px;">
+                <label for="CustomCategory">Enter Custom Category Type:</label>
+                <input type="text" id="CustomCategory" name="customCategory">
+            </div>
+
+            <label for="AddInventoryUnits">New Inventory Item Units:</label>
+            <select id="AddInventoryUnits" name="units" onchange="toggleCustomUnits(this)">
+                <option value="" disabled selected>Select Category:</option>
+                <option value="ounces">Ounces</option>
+                <option value = "gallons">Gallons</option>
+                <option value = "sandwich">Sandwich</option>
+                <option value = "pastry">Pastry</option>
+                <option value = "bottle">Bottle</option>
+                <option value = "napkins">Napkins</option>
+                <option value = "cups">Cups</option>
+                <option value = "bags">Bags</option>
+                <option value = "lids">Lids</option>
+                <option value = "mL">mL</option>
+                <option value="Other">Other</option>
+            </select>
+            <div id="customUnitsDiv" style="display: none; margin-top: 10px;">
+                <label for="CustomUnits">Enter Custom Units:</label>
+                <input type="text" id="CustomUnits" name="customUnits">
+            </div>
+        
+            <button type="submit">Add Inventory</button>
+          </form>
+        <!-- Delete Inventory Item -->
+        <form action="/delete-inventory" method="POST">          
+            <label for="DeleteInventoryName">Delete Inventory Item Name:</label>
+            <input type="text" id="DeleteInventoryName" name="name">
+        
+            <button type="submit">Delete Inventory Item</button>
+        </form>
+
+        <label for="selectInventory">Select Inventory To Update:</label>
+        <form id="selectInventory"></form>
+        <label for="updateType">Update Type:</label>
+        <form id="updateType">
+        <select id="updateType2">
+            <option value="cur+">Add to Current</option>
+            <option value = "cur-">Subtract from Current</option>
+            <option value = "cur">Set Current</option>
+            <option value = "fill">Set Fill-To</option>
+            <option value = "tar">Set Target</option>
+        </select>
+        </form>
+        <label for="changeValue">Enter Value:</label>
+        <input type="number" id="changeValue" name="changeValue">
+        <button id="confirmU">Confirm Update</button>
+
+
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Current Quantity</th>
+                <th>Fill-To Quantity</th>
+                <th>Target Quantity</th>
+                <th>Units</th>
+                <th>Category</th>
+            </tr>
+            <% for (var i in supply) {%>
+                <tr>
+                    <td><%=supply[i].name%></td>
+                    <td><%=supply[i].currquant%></td>
+                    <td><%=supply[i].filltoquant%></td>
+                    <td><%=supply[i].targquant%></td>
+                    <td><%=supply[i].units%></td>
+                    <td><%=supply[i].category%></td>
+                </tr>
+                <% } %>
+        </table>
+
+    </div>
+    
+    <script src="functions.js"></script>
+    <script>
+        const new_url = '<%= url %>';
+
+        async function loadItemsI() {
+            target = document.getElementById("selectInventory");
+
+
+            data = await justDoIt('SELECT DISTINCT name FROM supply;',new_url);
+
+            const optionsHtml = data.rows.map(row =>
+                `<option value="${row.name}">${row.name}</option>`
+            ).join('');
+
+            target.innerHTML = `
+                <select name="selectInventory2" id="selectInventory2">
+                    ${optionsHtml}
+                </select>
+            `;
+        }
+
+        document.getElementById("confirmU").addEventListener("click",async function() {
+
+            let changeCol="currquant";
+
+            if (document.getElementById("updateType2").value=="fill"){
+                changeCol="filltoquant";
+            }
+            if (document.getElementById("updateType2").value=="tar"){
+                changeCol="targquant";
+            }
+
+            let curVal = parseInt(document.getElementById("changeValue").value);
+
+            if (document.getElementById("updateType2").value=="cur+"){
+                data = await justDoIt("SELECT currquant FROM supply where name = '"+document.getElementById("selectInventory2").value+"';",new_url);
+                curVal = data.rows[0].currquant+curVal;
+            }
+            if (document.getElementById("updateType2").value=="cur-"){
+                data = await justDoIt("SELECT currquant FROM supply where name = '"+document.getElementById("selectInventory2").value+"';",new_url);
+                curVal = data.rows[0].currquant-curVal;
+            }
+
+            console.log(`UPDATE supply SET ${changeCol} = ${curVal} `+ "WHERE name = '"+document.getElementById("selectInventory2").value+"';");
+            await justDoIt(`UPDATE supply SET ${changeCol} = ${curVal} `+ "WHERE name = '"+document.getElementById("selectInventory2").value+"';",new_url)
+            
+        });
+    </script>
+</body>

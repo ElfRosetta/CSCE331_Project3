@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <section class="header">
+        <section class="menuLabel">Menu</section>
+        <section class="weatherAndLogin">
+            <button class="header-category-button" onclick="location.href='/login'">Log Out</button>
+            <button class="header-category-button" id="managerButton">Manager Side</button>
+            <p id="userLoggedIn"></p>
+            <p>Temperature: <%= ((weather.main.temp -273.15) * 9/5 + 32).toFixed(2) %> °F</p>
+        </section>
+    </section>
+    <div class="scrollyZone">
+
+        <div class="customize-container">
+            <div class="menu-categories">
+                <% for (var i in data.item_categories) {%>
+                    <button class="menu-category-button" 
+                        onclick="location.href='/menu/<%= data.item_categories[i].item_category %>'" 
+                        onmouseenter='showImages("/images/<%= data.item_categories[i].item_category %>.jpg")'>
+                        <%= data.item_categories[i].item_category %>
+                    </button>
+                <% } %>
+            </div>
+        
+            <div class="customize-image-wrapper">
+                <img class="customize-image" src="/images/<%= data.item_categories[0].item_category%>.jpg" alt="Category Preview">
+            </div>
+        </div>
+
+    </div>
+    <section class="footnote">
+        <section class="companyLabel">
+            <p>© 2025 Penguin Coffee Company</p>
+            <p>Contact: penguinCoffee@aol.com | 123.456.7890</p>
+        </section>
+        <div id="google_translate_element"></div>
+        <div class="button-group">
+            <button class="seeOrder" onclick="goToOrder('/menu')">Current Order</button>
+            <button class="colorChangeButton" onclick="toggleTheme()">Accessibility Features</button>
+        </div>
+    </section>
+
+    <script src="/functions.js"></script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        setAccess(logedUserID(), '<%= url %>');
+        logedUserID();
+        function showImages(src) {
+            const wrapper = document.querySelector('.customize-image-wrapper');
+            const image = document.querySelector('.customize-image');
+            image.src = src;
+            wrapper.style.display = 'flex';
+        }
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            storeLanguagePreference();
+            applyStoredLanguage();
+        });
+    
+        document.getElementById('managerButton').addEventListener("click", () => {
+            if (getAccess() == 'manager') {
+                location.href = '/manager';
+            }
+        });
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            const savedZoom = localStorage.getItem('zoom');
+
+            if (savedTheme === 'bold') {
+            document.body.classList.add('boldRoot');
+            }
+
+            if (savedZoom) {
+            document.body.style.zoom = savedZoom;
+            }
+        };
+    </script>
+</body>

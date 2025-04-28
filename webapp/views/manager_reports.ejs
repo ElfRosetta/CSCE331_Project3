@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<head>
+    <title>Home Page</title>
+    <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f4f6f8;
+          padding: 40px;
+        }
+    
+        #resultTable {
+          width: 100%;
+          border-collapse: collapse;
+          background-color: white;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          overflow: hidden;
+        }
+    
+        #resultTable thead {
+          background-color: #007bff;
+          color: white;
+          text-align: left;
+        }
+    
+        #resultTable th, #resultTable td {
+          padding: 14px 20px;
+          border-bottom: 1px solid #ddd;
+        }
+    
+        #resultTable tbody tr:hover {
+          background-color: #f1f1f1;
+        }
+    
+        #resultTable tbody tr:last-child td {
+          border-bottom: none;
+        }
+    
+        @media (max-width: 768px) {
+          #resultTable, #resultTable thead, #resultTable tbody, #resultTable th, #resultTable td, #resultTable tr {
+            display: block;
+          }
+    
+          #resultTable tr {
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: white;
+          }
+    
+          #resultTable td {
+            padding: 10px 15px;
+            text-align: right;
+            position: relative;
+          }
+    
+          #resultTable td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 15px;
+            width: 50%;
+            padding-right: 10px;
+            font-weight: bold;
+            text-align: left;
+          }
+        }
+      </style>
+</head>
+<body>
+    <div class = "ManagerHeader">
+        <button class="backToManagerHome" onclick="location.href='/manager'">Manager Home</button>
+        <button class = "backtoManagerReports" onclick="location.href='manager_reports'">Reports</button>
+        <button class = "backtoManagerEmployees" onclick="location.href='manager_employees'">Employees</button>
+        <button class = "backtoManagerItems" onclick="location.href='managerItems'">Items</button>
+        <button class = "backtoManagerInventory" onclick="location.href='manager_inventory'">Inventory</button>
+        <button class="backToMenu" onclick="location.href='/menu'">Back To Menu</button>
+    </div>
+
+    <div class = "Reports">
+        <h1>Reports</h1>
+        <form id="reportCmd">
+            <label for="startActiveDateInput">DateSA:</label>
+            <input type="date" id="startActiveDateInput" name="DateSA"><br><br>
+
+            <label for="startActiveTimeInput">TimeSA:</label>
+            <input type="time" id="startActiveTimeInput" name="TimeSA"><br><br>
+
+
+            <label for="endActiveDateInput">DateEA:</label>
+            <input type="date" id="endActiveDateInput" name="DateEA"><br><br>
+
+            <label for="endActiveTimeInput">TimeEA:</label>
+            <input type="time" id="endActiveTimeInput" name="TimeEA"><br><br>
+
+
+            <label for="startCompareDateInput">DateSC:</label>
+            <input type="date" id="startCompareDateInput" name="DateSC"><br><br>
+
+            <label for="startCompareTimeInput">TimeSC:</label>
+            <input type="time" id="startCompareTimeInput" name="TimeSC"><br><br>
+
+
+            <label for="endCompareDateInput">DateEC:</label>
+            <input type="date" id="endCompareDateInput" name="DateEC"><br><br>
+
+            <label for="endCompareTimeInput">TimeEC:</label>
+            <input type="time" id="endCompareTimeInput" name="TimeEC"><br><br>
+
+        </form>
+        <form id="selectOrderStyle">
+            <select name="OrderBy" id="OrderBy">
+                <option value="item">Item</option>
+                <option value="syrup">Syrup</option>
+                <option value="milk">Milk</option>
+                <option value="sales">Sales</option>
+                <option value="sold">Sold</option>
+                <option value="salesperhour">Sales per Hour</option>
+                <option value="soldperhour">Sold per Hour</option>
+                <option value="salesdifference">Sales Difference</option>
+                <option value="solddifference">Sold Difference</option>
+                <option value="salesperhourdifference">Sales per Hour Difference</option>
+                <option value="soldperhourdifference">Sold per Hour Difference</option>
+
+            </select>
+        </form>
+        <form id="selectOrderDir">
+            <select name="OrderType" id="OrderType">
+                <option value="ASC">Ascending</option>
+                <option value="DESC">Descending</option>
+            </select>
+        </form>
+        <button id="reporter">Run Report</button>
+
+        <form id="selectReportType">
+            <select name="ReportType" id="ReportType">
+                <option value="Items">Items</option>
+                <option value="Emp">Employees</option>
+            </select>
+        </form>
+
+        <label for="sales">Sales</label>
+        <div id="sales">0</div>
+
+        <label for="salesperhour">Sales per Hour</label>
+        <div  id="salesperhour">0</div>
+
+        <label for="salesdifference">Sales Difference</label>
+        <div  id="salesdifference">0</div>
+
+        <label for="salesperhourdifference">Sales per Hour Difference</label>
+        <div  id="salesperhourdifference">0</div>
+        
+
+        <table id="resultTable">
+            <thead>
+              <tr></tr> <!-- This will be populated with column headers -->
+            </thead>
+            <tbody>
+              <!-- Rows will be dynamically populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="functions.js"></script>
+    <script>
+        
+
+
+
+        document.getElementById("reporter").addEventListener("click", async function() {
+
+            const today1 = new Date();
+            const year = today1.getFullYear();
+            const month = String(today1.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+            const day = String(today1.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+            
+
+            
+            startActiveDateStr = document.getElementById('startActiveDateInput').value;
+            if (startActiveDateStr==""){
+                startActiveDateStr=today;
+            }
+
+            
+            startActiveTimeStr = document.getElementById('startActiveTimeInput').value;
+            if (startActiveTimeStr==""){
+                startActiveTimeStr="06:00";
+            }
+
+
+            endActiveDateStr = document.getElementById('endActiveDateInput').value;
+            if (endActiveDateStr==""){
+                endActiveDateStr=today;
+            }
+            endActiveTimeStr = document.getElementById('endActiveTimeInput').value;
+            if (endActiveTimeStr==""){
+                endActiveTimeStr="14:00";
+            }
+
+            startCompareDateStr = document.getElementById('startCompareDateInput').value;
+            if (startCompareDateStr==""){
+                startCompareDateStr="2024-05-19";
+            }
+            startCompareTimeStr = document.getElementById('startCompareTimeInput').value;
+            if (startCompareTimeStr==""){
+                startCompareTimeStr="06:00";
+            }
+            
+            endCompareDateStr = document.getElementById('endCompareDateInput').value;
+            if (endCompareDateStr==""){
+                endCompareDateStr=today;
+            }
+            endCompareTimeStr = document.getElementById('endCompareTimeInput').value;
+            if (endCompareTimeStr==""){
+                endCompareTimeStr="14:00";
+            }
+
+            startActiveObj = new Date(`${startActiveDateStr}T${startActiveTimeStr}:00`);
+
+
+            endActiveObj = new Date(`${endActiveDateStr}T${endActiveTimeStr}:00`);
+
+
+            startCompareObj = new Date(`${startCompareDateStr}T${startCompareTimeStr}:00`);
+            
+            endCompareObj = new Date(`${endCompareDateStr}T${endCompareTimeStr}:00`);
+
+
+
+            startActiveYear = startActiveObj.getFullYear();
+            endActiveYear = endActiveObj.getFullYear();
+            startActiveMonth = startActiveObj.getMonth()+1;
+            endActiveMonth = endActiveObj.getMonth()+1;
+            startActiveDay = startActiveObj.getDate();
+            endActiveDay = endActiveObj.getDate();
+            startActiveHour = startActiveObj.getHours();
+            endActiveHour = endActiveObj.getHours();
+            startActiveMinute = startActiveObj.getMinutes();
+            endActiveMinute = endActiveObj.getMinutes();
+
+            startCompareYear = startCompareObj.getFullYear();
+            endCompareYear = endCompareObj.getFullYear();
+            startCompareMonth = startCompareObj.getMonth()+1;
+            endCompareMonth = endCompareObj.getMonth()+1;
+            startCompareDay = startCompareObj.getDate();
+            endCompareDay = endCompareObj.getDate();
+            startCompareHour = startCompareObj.getHours();
+            endCompareHour = endCompareObj.getHours();
+            startCompareMinute = startCompareObj.getMinutes();
+            endCompareMinute = endCompareObj.getMinutes();
+
+            const startActiveDateObj = new Date(startActiveDateStr);
+            const endActiveDateObj = new Date(endActiveDateStr);
+            const startCompareDateObj = new Date(startCompareDateStr);
+            const endCompareDateObj = new Date(endCompareDateStr);
+
+            minActiveDur = ((endActiveDateObj-startActiveDateObj)/ (1000 * 60 * 60 * 24))+1;
+            minCompareDur = ((endCompareDateObj-startCompareDateObj)/ (1000 * 60 * 60 * 24))+1;
+
+            minActiveDur*=((60*(endActiveHour-startActiveHour))+(endActiveMinute-startActiveMinute+1));
+
+
+            minCompareDur*=((60*(endCompareHour-startCompareHour))+(endCompareMinute-startCompareMinute+1));
+
+
+            console.log(minCompareDur);
+
+            sortBy=document.getElementById("OrderBy").value;
+            sortDir=document.getElementById("OrderType").value;
+           
+            console.log(JSON.stringify({minActiveDur,startActiveYear,endActiveYear,startActiveMonth,endActiveMonth,startActiveDay,endActiveDay,startActiveHour,endActiveHour,startActiveMinute,endActiveMinute,
+                                      minCompareDur,startCompareYear,endCompareYear,startCompareMonth,endCompareMonth,startCompareDay,endCompareDay,startCompareHour,endCompareHour,startCompareMinute,endCompareMinute,
+                                      sortBy,sortDir
+                }))
+            
+            if((document.getElementById("ReportType").value)!="Emp"){
+                const response = await fetch('http://localhost:3000/itemReport', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({minActiveDur,startActiveYear,endActiveYear,startActiveMonth,endActiveMonth,startActiveDay,endActiveDay,startActiveHour,endActiveHour,startActiveMinute,endActiveMinute,
+                                        minCompareDur,startCompareYear,endCompareYear,startCompareMonth,endCompareMonth,startCompareDay,endCompareDay,startCompareHour,endCompareHour,startCompareMinute,endCompareMinute,
+                                        sortBy,sortDir
+                    })
+                });
+
+                if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+
+                const table = document.getElementById('resultTable');
+                const thead = table.querySelector('thead');
+                const tbody = table.querySelector('tbody');
+
+                
+                thead.innerHTML = '<tr></tr>';
+                tbody.innerHTML = '';
+
+                const headerRow = thead.querySelector('tr');
+                data.fields.forEach(field => {
+                    const th = document.createElement('th');
+                    th.textContent = field.name;
+                    headerRow.appendChild(th);
+                });
+
+                            
+                sumCol5 = 0;
+                sumCol7 = 0;
+                sumCol9 = 0;
+                sumCol11 = 0;
+
+
+                data.rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    data.fields.forEach((field, index) => {
+                        const value = row[field.name] || '0';
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+
+                        const nValue = parseFloat(value);
+                        if (!isNaN(nValue)) {
+                            if (index === 3) sumCol5 += nValue;
+                            if (index === 5) sumCol7 += nValue;
+                            if (index === 7) sumCol9 += nValue;
+                            if (index === 9) sumCol11 += nValue;
+                        }
+                    });
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("sales").textContent=String(sumCol5.toFixed(2));
+                document.getElementById("salesperhour").textContent=String(sumCol7.toFixed(2));
+                document.getElementById("salesdifference").textContent=String(sumCol9.toFixed(2));
+                console.log(sumCol11.toFixed(2));
+                document.getElementById("salesperhourdifference").textContent=String(sumCol11.toFixed(2));
+
+
+            } else {
+                alert('Error finding data');
+            }
+            }
+            else{
+                const response = await fetch('http://localhost:3000/empReport', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({minActiveDur,startActiveYear,endActiveYear,startActiveMonth,endActiveMonth,startActiveDay,endActiveDay,startActiveHour,endActiveHour,startActiveMinute,endActiveMinute,
+                                        minCompareDur,startCompareYear,endCompareYear,startCompareMonth,endCompareMonth,startCompareDay,endCompareDay,startCompareHour,endCompareHour,startCompareMinute,endCompareMinute,
+                                        sortBy,sortDir
+                    })
+
+                    
+                });
+
+                if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+
+                const table = document.getElementById('resultTable');
+                const thead = table.querySelector('thead');
+                const tbody = table.querySelector('tbody');
+
+                
+                thead.innerHTML = '<tr></tr>';
+                tbody.innerHTML = '';
+
+                const headerRow = thead.querySelector('tr');
+                data.fields.forEach(field => {
+                    const th = document.createElement('th');
+                    th.textContent = field.name;
+                    headerRow.appendChild(th);
+                });
+
+                            
+                sumCol5 = 0;
+                sumCol7 = 0;
+                sumCol9 = 0;
+                sumCol11 = 0;
+
+
+                data.rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    data.fields.forEach((field, index) => {
+                        const value = row[field.name] || '0';
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+
+                        const nValue = parseFloat(value);
+                        if (!isNaN(nValue)) {
+                            if (index === 2) sumCol5 += nValue;
+                            if (index === 4) sumCol7 += nValue;
+                            if (index === 6) sumCol9 += nValue;
+                            if (index === 8) sumCol11 += nValue;
+                        }
+                    });
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById("sales").textContent=String(sumCol5.toFixed(2));
+                document.getElementById("salesperhour").textContent=String(sumCol7.toFixed(2));
+                document.getElementById("salesdifference").textContent=String(sumCol9.toFixed(2));
+                document.getElementById("salesperhourdifference").textContent=String(sumCol11.toFixed(2));
+
+
+            } else {
+                alert('Error finding data');
+            }
+            }
+
+            
+        });
+
+
+
+    </script>
+</body>
